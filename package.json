@@ -4,7 +4,7 @@
   "description": "Actyx-Pond node-red integration",
   "repository": {
     "type": "git",
-    "url": "https://github.com/actyx-contrib/actyx-project-cli"
+    "url": "https://github.com/actyx-contrib/node-red-contrib-actyx-pond"
   },
   "license": "Apache-2.0",
   "author": "Alex Halemba",
