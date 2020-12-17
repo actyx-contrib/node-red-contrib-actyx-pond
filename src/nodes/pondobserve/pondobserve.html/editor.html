@@ -1,0 +1,41 @@
+<script type="text/html" data-template-name="pondobserve">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-fishIdType"><i class="icon-tag"></i> FishIdType</label>
+    <input type="text" id="node-input-fishIdType" placeholder="fishIdType">
+  </div>
+  <div class="form-row">
+    <label for="node-input-fishIdName"><i class="icon-tag"></i> fishIdName</label>
+    <input type="text" id="node-input-fishIdName" placeholder="fishIdName">
+  </div>
+  <div class="form-row">
+    <label for="node-input-fishIdVersion"><i class="icon-tag"></i> fishIdVersion</label>
+    <input type="text" id="node-input-fishIdVersion" placeholder="fishIdVersion">
+  </div>
+  <div class="form-row">
+    <label for="node-input-initState"><i class="icon-tag"></i> initState</label>
+    <input type="text" id="node-input-initState" placeholder="initState">
+  </div>
+  <div class="form-row">
+    <label for="node-input-where"><i class="icon-tag"></i> where</label>
+    <input type="text" id="node-input-where" placeholder="where">
+  </div>
+  <div class="form-row" style="position: relative; margin-bottom: 0px;">
+    <label for="node-input-onEvent"><i class="fa fa-file-code-o"></i>OnEvent</label>
+    <input type="hidden" id="node-input-onEvent" autofocus="autofocus">
+    <div style="position: absolute; right:0;display:inline-block; text-align: right; font-size: 0.8em;">
+        <span >Syntax Highlight:</span>:
+        <select id="node-input-format" style="width:110px; font-size: 10px !important;  height: 24px; padding:0;">
+            <option value="javascript">Javascript</option>
+            <option value="text">Text</option>
+        </select>
+        <!--<button id="node-template-expand-editor" class="red-ui-button red-ui-button-small"><i class="fa fa-expand"></i></button>-->
+    </div>
+</div>
+<div class="form-row node-text-editor-row">
+    <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-onEvent-editor" ></div>
+</div>
+</script>

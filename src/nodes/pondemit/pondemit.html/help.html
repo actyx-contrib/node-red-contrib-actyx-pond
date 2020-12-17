@@ -1,0 +1,36 @@
+<script type="text/html" data-help-name="pondemit">
+  <h1>Actyx Pond emit(tag, payload)</h1>
+  <p>Publish you payload in actyxOS</p>
+  <p>
+    <code>msg.payload</code> is used as the payload of the published event. If
+    the <code>tags</code> are defined as template it is rendered with the data in the <code>msg</code>
+  </p>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">string | number | object</span>
+      </dt>
+      <dd>The payload of the event to publish with the tags defined in the node settings. </dd>
+  </dl>
+  <h3>Output</h3>
+  <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">string | number | object</span>
+      </dt>
+      <dd>The payload of the publish event. </dd>
+  </dl>
+  <h3>Settings</h3>
+  <dl class="message-properties">
+      <dt>Name
+          <span class="property-type">string</span>
+      </dt>
+      <dd>Name of the node-red node visible in the UI.</dd>
+      <dt>Tags
+        <span class="property-type">string</span>
+      </dt>
+      <dd>Tags applied to the event. To add multiple tags, sepprate them with <code>space</code>, <code>,</code> or <code>;</code>.</dd>
+      <dd>The tag could be advanced with data from the <code>msg</code>.</dd>
+      <dd><code>machine machine:{{payload.name}}</code> </dd>
+  </dl>
+</script>

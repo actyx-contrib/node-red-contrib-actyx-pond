@@ -1,0 +1,77 @@
+<script type="text/html" data-help-name="actyxfish">
+  <h1>Actyx fish</h1>
+  <p>Fish definition for <code>Pond observe fish</code></p>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">any</span>
+      </dt>
+      <dd>optional payload to define the fish (<code>{{payload.name}}</code>).</dd>
+  </dl>
+  <h3>Output</h3>
+  <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">any</span>
+      </dt>
+      <dd>Unchanged payload</dd>
+      <dt>fish
+        <span class="property-type">FishMessage</span>
+      </dt>
+      <dd>
+        Fish for the observe-fish node
+        <p>
+          Properties:
+            <dt style="margin-left: 25px; font-size: small;">fishIdName <span class="property-type">string</span></dt>
+            <dt style="margin-left: 25px; font-size: small;">fishIdType <span class="property-type">string</span></dt>
+            <dt style="margin-left: 25px; font-size: small;">fishIdVersion <span class="property-type">number</span></dt>
+            <dt style="margin-left: 25px; font-size: small;">initState <span class="property-type">string</span></dt>
+            <dt style="margin-left: 25px; font-size: small;">where <span class="property-type">string</span></dt>
+            <dt style="margin-left: 25px; font-size: small;">onEvent <span class="property-type">string</span></dt>
+        </p>
+      </dd>
+
+  </dl>
+  <h3>Settings</h3>
+  <dl class="message-properties">
+    <dt>Name<span class="property-type">string</span></dt>
+    <dd>Name of the node-red node visible in the UI.</dd>
+
+    <dt>Fish id type<span class="property-type">string</span></dt>
+    <dd>A general description for the class of thing the Fish represents, e.g. 'robot'</dd>
+
+    <dt>Fish id name<span class="property-type">string</span></dt>
+    <dd>Concrete name of the represented thing, e.g. 'superAssembler2000' or '{{payload.name}}'</dd>
+
+    <dt>Fish id version<span class="property-type">number</span></dt>
+    <dd>Version of the underlying code. Must be increased whenever the Fish’s underlying logic <code>(onEvent)</code> or event selection changes <code>(where)</code>.</dd>
+
+    <dt>Initial state<span class="property-type">JSON</span></dt>
+    <dd>Initial state of the fish</dd>
+
+    <dt>where<span class="property-type">string</span></dt>
+    <dd>
+      <p>Selection of events to aggregate in this Fish.</p>
+      <p>
+        Use <code>&</code> (and) and <code>|</code> (or) to create more complex subscriptions<br />
+        E.g.: <code style="white-space: break-spaces; line-break: anywhere;">robot & robot:robot1 & order-released-for:robot1 | stop-system & stop-system:robot</code>
+      </p>
+      <p>
+        The Fish will apply all <code>&</code> first and apply the <code>|</code> as second step.<br />
+        <code style="white-space: break-spaces; line-break: anywhere;">Tags('robot', 'robot:robot1', 'order-released-for:robot1').or(Tags('stop-system', 'stop-system:robot'))</code><br />
+      </p>
+    </dd>
+
+    <dt>OnEvent<span class="property-type">Function body</span></dt>
+    <dd>
+      <p>Function to create the next state from previous state and next event.</p>
+      <p>
+        Do note however that — while it may modify the passed-in state — this function must be _pure_:
+        <ul>
+          <li>It should not cause any side-effects (except logging)</li>
+          <li>It should not reference dynamic outside state like random numbers or the current time. The result must depend purely on the input parameters.</li>
+        </ul>
+      </p>
+    </dd>
+  </dl>
+</script>

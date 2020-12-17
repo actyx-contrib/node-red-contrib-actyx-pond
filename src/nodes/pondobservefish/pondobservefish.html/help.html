@@ -1,0 +1,33 @@
+<script type="text/html" data-help-name="pondobservefish">
+  <h1>Actyx observe fish</h1>
+  <p>Observe the <code>fish</code> in the input signal and emit signals when the <code>fish state</code> changes.</p>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>payload
+        <span class="property-type">any</span>
+    </dt>
+    <dd>payload is not used</dd>
+    <dt>fish
+        <span class="property-type">FishMessage</span>
+    </dt>
+    <dd>
+      <p>Fish to observe. Use the Actyx Fish node to inject a fish into the stream.</p>
+      <p>if the <code>FishId</code> change, the current observation get terminated and a new observation get started.</p>
+    </dd>
+  </dl>
+
+  <h3>Output</h3>
+  <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">any</span>
+      </dt>
+      <dd>State of the observing fish</dd>
+  </dl>
+
+  <h3>Settings</h3>
+  <dl class="message-properties">
+    <dt>Name<span class="property-type">string</span></dt>
+    <dd>Name of the node-red node visible in the UI.</dd>
+  <dl>
+</script>
