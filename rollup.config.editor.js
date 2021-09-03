@@ -1,45 +1,48 @@
-import fs from "fs";
-import glob from "glob";
-import path from "path";
-import typescript from "@rollup/plugin-typescript";
+import fs from "fs"
+import glob from "glob"
+import path from "path"
+import typescript from "@rollup/plugin-typescript"
 
-import packageJson from "./package.json";
+import packageJson from "./package.json"
 
-const allNodeTypes = Object.keys(packageJson["node-red"].nodes);
+const allNodeTypes = [
+  ...Object.keys(packageJson["node-red"].nodes),
+]
+
 
 const htmlWatch = () => {
   return {
     name: "htmlWatch",
     load(id) {
-      const editorDir = path.dirname(id);
-      const htmlFiles = glob.sync(path.join(editorDir, "*.html"));
-      htmlFiles.map((file) => this.addWatchFile(file));
+      const editorDir = path.dirname(id)
+      const htmlFiles = glob.sync(path.join(editorDir, "*.html"))
+      htmlFiles.map((file) => this.addWatchFile(file))
     },
-  };
-};
+  }
+}
 
 const htmlBundle = () => {
   return {
     name: "htmlBundle",
     renderChunk(code, chunk, _options) {
-      const editorDir = path.dirname(chunk.facadeModuleId);
-      const htmlFiles = glob.sync(path.join(editorDir, "*.html"));
-      const htmlContents = htmlFiles.map((fPath) => fs.readFileSync(fPath));
+      const editorDir = path.dirname(chunk.facadeModuleId)
+      const htmlFiles = glob.sync(path.join(editorDir, "*.html"))
+      const htmlContents = htmlFiles.map((fPath) => fs.readFileSync(fPath))
 
       code =
         '<script type="text/javascript">\n' +
         code +
         "\n" +
         "</script>\n" +
-        htmlContents.join("\n");
+        htmlContents.join("\n")
 
       return {
         code,
         map: { mappings: "" },
-      };
+      }
     },
-  };
-};
+  }
+}
 
 const makePlugins = (nodeType) => [
   htmlWatch(),
@@ -55,7 +58,7 @@ const makePlugins = (nodeType) => [
     noEmitOnError: process.env.ROLLUP_WATCH ? false : true,
   }),
   htmlBundle(),
-];
+]
 
 const makeConfigItem = (nodeType) => ({
   input: `src/nodes/${nodeType}/${nodeType}.html/index.ts`,
@@ -67,6 +70,6 @@ const makeConfigItem = (nodeType) => ({
   watch: {
     clearScreen: false,
   },
-});
+})
 
-export default allNodeTypes.map((nodeType) => makeConfigItem(nodeType));
+export default allNodeTypes.map((nodeType) => makeConfigItem(nodeType))

@@ -8,6 +8,7 @@ RED.nodes.registerType<PondObserveFishEditorNodeProperties>('pondobservefish', {
   color: '#F3B567',
   defaults: {
     name: { value: '' },
+    pond: { type: 'pond-config', value: '' },
   },
   inputs: 1,
   outputs: 1,

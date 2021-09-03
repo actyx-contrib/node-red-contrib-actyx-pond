@@ -6,13 +6,16 @@ declare const RED: EditorRED
 
 interface PondObserveEditorNodeProperties
   extends EditorNodeProperties,
-    PondObserveOptions {}
+    PondObserveOptions {
+  onEventEditor?: AceAjax.Editor
+}
 
 RED.nodes.registerType<PondObserveEditorNodeProperties>('pondobserve', {
   category: 'Actyx Pond',
   color: '#F3B567',
   defaults: {
     name: { value: '' },
+    pond: { type: 'pond-config', value: '' },
     ...defaultFish,
     syntax: { value: 'javascript' },
   },
@@ -24,46 +27,44 @@ RED.nodes.registerType<PondObserveEditorNodeProperties>('pondobserve', {
     return this.name || 'pond observe'
   },
   oneditprepare: function () {
-    //@ts-ignore
     if (!this.syntax) {
       this.syntax = 'javascript'
       $('#node-input-syntax').val(this.syntax)
     }
-    //@ts-ignore
     this.onEventEditor = RED.editor.createEditor({
       id: 'node-input-onEvent-editor',
       mode: 'ace/mode/javascript',
       value: $('#node-input-onEvent').val()?.toString() || '',
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this
     $('#node-input-format').on('change', () => {
       const mod = 'ace/mode/' + $('#node-input-format').val()
-      //@ts-ignore
-      node.onEventEditor.getSession().setMode({
-        path: mod,
-        v: Date.now(),
-      })
+      node.onEventEditor
+        ?.getSession()
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        .setMode({
+          path: mod,
+          v: Date.now(),
+        })
     })
 
     $('#node-input-initState').typedInput({
-      //@ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       type: 'json',
       types: ['json'],
     })
   },
   oneditsave: function () {
-    //@ts-ignore
-    $('#node-input-onEvent').val(this.onEventEditor.getValue())
-    //@ts-ignore
-    this.onEventEditor.destroy()
-    //@ts-ignore
+    $('#node-input-onEvent').val(this.onEventEditor?.getValue() || '')
+    this.onEventEditor?.destroy()
     delete this.onEventEditor
   },
   oneditcancel: function () {
-    //@ts-ignore
-    this.onEventEditor.destroy()
-    //@ts-ignore
+    this.onEventEditor?.destroy()
     delete this.onEventEditor
   },
   //   oneditresize: function(size) {

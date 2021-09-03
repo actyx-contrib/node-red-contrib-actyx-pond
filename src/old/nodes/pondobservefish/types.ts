@@ -2,7 +2,9 @@ import { EditorNodeProperties, Node, NodeDef } from 'node-red'
 
 export interface PondObserveNodeDef extends NodeDef, PondObserveFishOptions {}
 
-export interface PondObserveFishOptions {}
+export interface PondObserveFishOptions {
+  pond: string
+}
 
 export interface PondObserveFishNodeDef
   extends NodeDef,

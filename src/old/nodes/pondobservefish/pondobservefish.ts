@@ -1,9 +1,11 @@
-import { CancelSubscription, Fish } from '@actyx/pond'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CancelSubscription, Fish } from 'PondV3'
 import { NodeInitializer } from 'node-red'
 import { FishMessage } from '../actyxfish/types'
 import { getPond } from '../pondLib/pondLib'
-import { mkFish, mkFishId } from '../pondLib/util'
+import { mkFishId, mkFish } from '../pondLib/util'
 import { PondObserveFishNode, PondObserveFishNodeDef } from './types'
+import { PondConfigNode } from '../pondemit/types'
 
 const nodeInit: NodeInitializer = (RED): void => {
   function PondObserveFishNodeConstructor(
@@ -12,11 +14,18 @@ const nodeInit: NodeInitializer = (RED): void => {
   ): void {
     RED.nodes.createNode(this, config)
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const node = this
     let fish: Fish<any, any> | undefined = undefined
     let currentObservation: CancelSubscription | undefined = undefined
 
-    getPond(node).then((pond) => {
+    console.warn(
+      'pondobservefish - pond-config: ',
+      RED.nodes.getNode(config.pond),
+    )
+    const pondConfig = RED.nodes.getNode(config.pond) as PondConfigNode
+
+    getPond(pondConfig, node).then((pond) => {
       node.status({
         fill: 'green',
         shape: 'ring',
@@ -49,14 +58,18 @@ const nodeInit: NodeInitializer = (RED): void => {
             currentObservation = undefined
           }
 
-          currentObservation = pond.observe(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          currentObservation = (pond as any).observe<any, any>(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             fish,
-            (newState) => {
+            (newState: any) => {
               node.send({
                 payload: newState,
               })
             },
-            (err) => node.warn(err),
+            (err: any) => node.warn(err),
           )
         }
 

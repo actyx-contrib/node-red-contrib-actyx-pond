@@ -1,6 +1,6 @@
 {
   "name": "@actyx-contrib/node-red-contrib-actyx-pond",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Actyx-Pond node-red integration",
   "repository": {
     "type": "git",
@@ -17,6 +17,8 @@
     "Actyx Pond"
   ],
   "scripts": {
+    "prepack_no": "npm run build",
+    "getNodeRedConfigNodeWorking": "cat dist/nodes/pond-config/pond-config.html dist/nodes/pondemit/pondemit.html > dist/nodes/pondemit/pondemit_comb.html && mv dist/nodes/pondemit/pondemit_comb.html dist/nodes/pondemit/pondemit.html",
     "copy": "copyfiles -u 2 \"./src/nodes/**/*.{png,svg}\" \"./dist/nodes/\"",
     "test": "jest --forceExit --detectOpenHandles --colors",
     "lint": "prettier --ignore-path .eslintignore --check '**/*.{js,ts,md}'; eslint --ext .js,.ts .",
@@ -31,15 +33,14 @@
   },
   "node-red": {
     "nodes": {
-      "pondemit": "./dist/nodes/pondemit/pondemit.js",
-      "pondobserve": "./dist/nodes/pondobserve/pondobserve.js",
-      "actyxfish": "./dist/nodes/actyxfish/actyxfish.js",
-      "pondobservefish": "./dist/nodes/pondobservefish/pondobservefish.js"
+      "actyx-pond": "./src/actyx-pond.js"
     }
   },
   "dependencies": {
-    "@actyx/pond": "^2.4.0",
-    "mustache": "^4.2.0"
+    "mustache": "^4.2.0",
+    "PondV2": "npm:@actyx/pond@2",
+    "PondV3": "npm:@actyx/pond@^3.0.0",
+    "semver": "^7.3.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.0.0",
@@ -48,11 +49,9 @@
     "@types/mustache": "^4.1.0",
     "@types/node": "^14.14.10",
     "@types/node-red": "^1.1.1",
-    "@types/node-red-node-test-helper": "^0.2.1",
+    "@types/semver": "^7.3.7",
     "@types/sinon": "^9.0.9",
     "@types/supertest": "^2.0.10",
-    "@typescript-eslint/eslint-plugin": "^4.9.0",
-    "@typescript-eslint/parser": "^4.9.0",
     "colorette": "^1.2.1",
     "concurrently": "^5.3.0",
     "copyfiles": "^2.4.1",
@@ -63,13 +62,11 @@
     "glob": "^7.1.6",
     "jest": "^26.6.3",
     "mustache": "^4.2.0",
-    "node-red": "^1.2.6",
-    "node-red-node-test-helper": "^0.2.5",
+    "node-red": "^2.0.1",
+    "node-red-node-test-helper": "^0.2.7",
     "onchange": "^7.0.2",
     "prettier": "^2.2.1",
-    "rollup": "^2.23.0",
-    "ts-jest": "^26.4.4",
-    "typescript": "^4.1.2"
+    "rollup": "^2.23.0"
   },
   "jest": {
     "testEnvironment": "node",

@@ -1,8 +1,10 @@
-import { Fish, FishId, Reduce, Tag, Tags, Where } from '@actyx/pond'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { FishId, Tag, Tags, Where, Fish as FishV2 } from 'PondV3'
+import { Fish as FishV3 } from 'PondV3'
 import { Node } from 'node-red'
 import { FishMessage } from '../actyxfish/types'
 
-export const compileTags = (where: string, node: Node) => {
+export const compileTags = (where: string, _node: Node): Where<unknown> => {
   const tokensWhere = where.split('').reduce<string[]>((acc, char) => {
     // ignore space
     if (char === ' ') {
@@ -63,24 +65,30 @@ export const compileTags = (where: string, node: Node) => {
 export const mkFishId = (fishData: FishMessage): FishId =>
   FishId.of(fishData.fishIdType, fishData.fishIdName, +fishData.fishIdVersion)
 
-export const mkFish = (fishData: FishMessage, node: Node): Fish<any, any> => ({
-  fishId: mkFishId(fishData),
-  initialState: JSON.parse(fishData.initState),
-  where: compileTags(fishData.where, node),
-  onEvent: mkOnEventFn(fishData.onEvent, node),
-})
+export const mkFish = <Fish extends FishV2<any, any> | FishV3<any, any>>(
+  fishData: FishMessage,
+  node: Node,
+): Fish =>
+  ({
+    fishId: mkFishId(fishData),
+    initialState: JSON.parse(fishData.initState),
+    where: compileTags(fishData.where, node),
+    onEvent: mkOnEventFn<Fish>(fishData.onEvent, node),
+  } as Fish)
 
-export const mkOnEventFn = (onEvent: string, node: Node) => {
+export const mkOnEventFn = <Fish extends FishV2<any, any> & FishV3<any, any>>(
+  onEvent: string,
+  node: Node,
+): Fish['onEvent'] => {
   try {
     return new Function(
       '__inState__',
       '__inEvent__',
       '__inMetadata__',
       `try{ return (${onEvent})(__inState__, __inEvent__, __inMetadata__) } catch {return __inState__}`,
-    ) as Reduce<any, any>
+    ) as Fish['onEvent']
   } catch (e) {
     node.warn(e)
-
     return (state: any) => state
   }
 }
