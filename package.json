@@ -39,7 +39,7 @@
   "dependencies": {
     "mustache": "^4.2.0",
     "PondV2": "npm:@actyx/pond@2",
-    "PondV3": "npm:@actyx/pond@^3.0.0",
+    "PondV3": "npm:@actyx/pond@^3.1.0",
     "semver": "^7.3.2"
   },
   "devDependencies": {

@@ -1,5 +1,7 @@
 *
-!src/**/*
+!src/*.js
+!src/*.html
+!src/icons/*
 !README.md
 !package.json
 !package-lock.json

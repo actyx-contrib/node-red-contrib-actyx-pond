@@ -1,6 +1,8 @@
 "use strict"
 Object.defineProperty(exports, "__esModule", { value: true })
+
 exports.getPond = void 0
+const { Tag } = require('PondV3')
 const PondV3 = require("PondV3")
 let pond = undefined
 let mkPond = false
@@ -9,9 +11,6 @@ const getPond = async (config, node) => {
     // if nobody is building the pond right now
     if (mkPond === false) {
       mkPond = true
-      if (config) {
-        console.log(config)
-      }
       pond = await PondV3.Pond.default({
         appId: config.appid,
         displayName: config.displayname,
@@ -32,7 +31,8 @@ const getPond = async (config, node) => {
       }, 25)
     })
   }
-  console.log('Actyx-Pond: Use existing pond')
+  console.log('Actyx-Pond: Return existing pond')
   return pond
 }
 exports.getPond = getPond
+exports.Tag = Tag

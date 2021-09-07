@@ -1,23 +1,27 @@
-const Mustache = require('mustache')
-const PondLib = require('../pondLib/pondLib')
-const Util = require("../pondLib/util")
+"use strict"
+Object.defineProperty(exports, "__esModule", { value: true })
+
+let { render } = require('mustache')
+let { getPond, Tag } = require('./pondLib')
+let { mkFishId, mkFish } = require("./util")
 
 const pondEmitNodeConstructor = (RED) => function (config) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
+  RED.nodes.createNode(this, config)
+  RED.log.info("register EmitNode")
   const node = this
   const { tags } = config
-  console.info('pond-config: ', RED.nodes.getNode(config.pond))
   this.status({ fill: 'yellow', shape: 'ring', text: 'connecting' })
   const pondConfig = RED.nodes.getNode(config.pond)
-  console.info('pondemit - connecting')
-  PondLib.getPond(pondConfig, node).then((pond) => {
-    console.info('pondemit - connected')
+  RED.log.info('pondemit - connecting')
+  getPond(pondConfig, node).then((pond) => {
+    RED.log.info('pondemit - connected')
     this.status({ fill: 'green', shape: 'dot', text: 'connected' })
     this.on('input', (msg, send, done) => {
       if (msg.payload) {
-        const actyxTags = Mustache.render(tags, msg)
+        const actyxTags = render(tags, msg)
           .split(/[\ ,;]/g)
-          .map((t) => PondLib.Tag(t))
+          .map((t) => Tag(t))
           .reduce((acc, t) => (acc ? acc.and(t) : t), undefined)
         if (actyxTags) {
           this.debug(actyxTags)
@@ -36,24 +40,25 @@ const pondEmitNodeConstructor = (RED) => function (config) {
 
 const pondConfigNodeConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
+  RED.log.info("register ConfigNode")
+
   const { pondVersion, appid, displayname, version, signature } = config
-  const node = this
-  node.pondVersion = pondVersion
-  node.appid = appid
-  node.displayname = displayname
-  node.version = version
-  node.signature = signature
+  this.pondVersion = pondVersion
+  this.appid = appid
+  this.displayname = displayname
+  this.version = version
+  this.signature = signature
 }
 
-const pondObserveFishNodeConstructor(config) {
+const pondObserveFishNodeConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
+  RED.log.info("register ObserveFishNode")
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const node = this
   let fish = undefined
   let currentObservation = undefined
-  console.warn('pondobservefish - pond-config: ', RED.nodes.getNode(config.pond))
   const pondConfig = RED.nodes.getNode(config.pond)
-  pondLib.getPond(pondConfig, node).then((pond) => {
+  getPond(pondConfig, node).then((pond) => {
     node.status({
       fill: 'green',
       shape: 'ring',
@@ -70,14 +75,14 @@ const pondObserveFishNodeConstructor(config) {
         done()
         return
       }
-      const incomingFishId = Util.mkFishId(message.fish)
+      const incomingFishId = mkFishId(message.fish)
       node.status({
         fill: 'green',
         shape: 'dot',
         text: `connected ${incomingFishId.entityType} ${incomingFishId.name}`,
       })
       if (!fish || fish.fishId !== incomingFishId) {
-        fish = Util.mkFish(message.fish, node)
+        fish = mkFish(message.fish, node)
         if (currentObservation) {
           currentObservation()
           currentObservation = undefined
@@ -99,17 +104,18 @@ const pondObserveFishNodeConstructor(config) {
 }
 
 const pondObserveNodeConstructor = (RED) => function (config) {
-  console.log(this, config)
+  RED.nodes.createNode(this, config)
+  RED.log.info("register ObserveNode")
+
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const node = this
-  RED.nodes.createNode(node, config)
+  // RED.nodes.createNode(node, config)
   node.status({ fill: 'yellow', shape: 'ring', text: 'connecting' })
-  console.warn('pondobserve - pond-config: ', RED.nodes.getNode(config.pond))
   const pondConfig = RED.nodes.getNode(config.pond)
-  pondLib.getPond(pondConfig, node).then((pond) => {
+  getPond(pondConfig, node).then((pond) => {
     node.status({ fill: 'green', shape: 'dot', text: 'connected' })
     setTimeout(() => {
-      pond.observe(Util.mkFish(config, node), (newState) => {
+      pond.observe(mkFish(config, node), (newState) => {
         node.send({
           payload: newState,
         })
@@ -118,29 +124,78 @@ const pondObserveNodeConstructor = (RED) => function (config) {
   })
 }
 
-
 const actyxFishNodeConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
+  RED.log.info("register FishNode")
   const { fishIdName, fishIdType, fishIdVersion, initState, where, onEvent, } = config
   this.on('input', (msg, send, done) => {
     send({
       ...msg,
       fish: {
-        fishIdName: Mustache.render(fishIdName, msg),
-        fishIdType: Mustache.render(fishIdType, msg),
+        fishIdName: render(fishIdName, msg),
+        fishIdType: render(fishIdType, msg),
         fishIdVersion,
-        initState: Mustache.render(initState, msg),
-        where: Mustache.render(where, msg),
-        onEvent: Mustache.render(onEvent, msg),
+        initState: render(initState, msg),
+        where: render(where, msg),
+        onEvent: render(onEvent, msg),
       },
     })
     done()
   })
 }
+
+const actyxAqlQueryConstructor = (RED) => function (config) {
+  RED.nodes.createNode(this, config)
+  RED.log.info("register AqlQueryNode")
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const node = this
+
+  const pondConfig = RED.nodes.getNode(config.pond)
+  if (pondConfig.pondVersion === 'v2') {
+    node.status({
+      fill: 'red',
+      shape: 'dot',
+      text: 'Actyx Version >= 2',
+    })
+    RED.log.error("Requires Actyx Version >= 2")
+    return
+  }
+  getPond(pondConfig, node).then((pond) => {
+    node.status({
+      fill: 'green',
+      shape: 'dot',
+      text: 'connected',
+    })
+    this.on('input', (msg, _send, done) => {
+      const query = render(config.aql, msg)
+      node.status({
+        fill: 'yellow',
+        shape: 'dot',
+        text: 'active',
+      })
+      pond.events().queryAql(query).then(res => {
+        node.send({
+          payload: res,
+        })
+        node.status({
+          fill: 'green',
+          shape: 'dot',
+          text: 'connected',
+        })
+        done()
+      }).catch((err) => {
+        node.warn(err)
+        done()
+      })
+    })
+  })
+}
+
 module.exports = {
   pondEmitNodeConstructor,
   pondConfigNodeConstructor,
   pondObserveFishNodeConstructor,
   pondObserveNodeConstructor,
   actyxFishNodeConstructor,
+  actyxAqlQueryConstructor,
 }

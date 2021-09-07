@@ -1,12 +1,16 @@
 "use strict"
-const Nodes = require('./node-constructors')
+Object.defineProperty(exports, "__esModule", { value: true })
+
+let nodes = require('./node-constructors')
 
 const nodeInit = (RED) => {
-  RED.nodes.registerType('pond-emit', Nodes.pondEmitNodeConstructor(RED))
-  RED.nodes.registerType('pond-config', Nodes.pondConfigNodeConstructor(RED))
-  RED.nodes.registerType('pond-observe-fish', Nodes.pondObserveFishNodeConstructor(RED))
-  RED.nodes.registerType('pond-observe', Nodes.pondObserveNodeConstructor(RED))
-  RED.nodes.registerType('actyx-fish', Nodes.actyxFishNodeConstructor(RED))
+  RED.nodes.registerType('pond-config', nodes.pondConfigNodeConstructor(RED))
+  RED.nodes.registerType('actyx-fish', nodes.actyxFishNodeConstructor(RED))
+  RED.nodes.registerType('pond-emit', nodes.pondEmitNodeConstructor(RED))
+  RED.nodes.registerType('pond-observe-fish', nodes.pondObserveFishNodeConstructor(RED))
+  RED.nodes.registerType('pond-observe', nodes.pondObserveNodeConstructor(RED))
+  RED.nodes.registerType('aql-query', nodes.actyxAqlQueryConstructor(RED))
+  RED.log.info("Actyx nodes initialized")
 }
 
 module.exports = nodeInit

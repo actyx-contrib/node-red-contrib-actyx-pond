@@ -27,25 +27,6 @@
       },
     };
 
-    RED.nodes.registerType('pond-emit', {
-      category: 'Actyx Pond',
-      color: '#F3B567',
-      defaults: {
-        name: { value: '' },
-        pond: { type: 'pond-config', value: '' },
-        tags: { value: 'something something:{{id}}', required: true },
-      },
-      inputs: 1,
-      outputs: 1,
-      align: 'right',
-      icon: 'pond.png',
-      paletteLabel: 'Pond Emit',
-      inputLabels: 'payload to send',
-      outputLabels: ['send payload'],
-      label: function () {
-        return this.name || 'pond emit';
-      },
-    });
     RED.nodes.registerType('pond-config', {
       category: 'config',
       defaults: {
@@ -77,7 +58,26 @@
         return this.pondVersion + ' - ' + this.appid;
       },
     });
-    RED.nodes.registerType('pond-observefish', {
+    RED.nodes.registerType('pond-emit', {
+      category: 'Actyx Pond',
+      color: '#F3B567',
+      defaults: {
+        name: { value: '' },
+        pond: { type: 'pond-config', value: '' },
+        tags: { value: 'something something:{{id}}', required: true },
+      },
+      inputs: 1,
+      outputs: 1,
+      align: 'right',
+      icon: 'pond.png',
+      paletteLabel: 'Pond Emit',
+      inputLabels: 'payload to send',
+      outputLabels: ['send payload'],
+      label: function () {
+        return this.name || 'pond emit';
+      },
+    });
+    RED.nodes.registerType('pond-observe-fish', {
       category: 'Actyx Pond',
       color: '#F3B567',
       defaults: {
@@ -197,6 +197,69 @@
         delete this.onEventEditor;
       },
     });
+
+    RED.nodes.registerType('aql-query', {
+      category: 'Actyx Pond',
+      color: '#F3B567',
+      defaults: {
+        name: { value: '' },
+        pond: { type: 'pond-config', value: '' },
+        aql: {
+          value: 'FROM allEvents',
+          required: true,
+        },
+      },
+      inputs: 1,
+      outputs: 1,
+      icon: 'pond.png',
+      paletteLabel: 'AQL-Query',
+      label: function () {
+        return this.name || 'AQL-Query';
+      },
+      oneditprepare: function () {
+        var _a;
+        //@ts-ignore
+        if (!this.syntax) {
+          this.syntax = 'AQL';
+          $('#node-input-syntax').val(this.syntax);
+        }
+        //@ts-ignore
+        this.aqlEditor = RED.editor.createEditor({
+          id: 'node-input-aql-editor',
+          mode: 'ace/mode/javascript',
+          value: ((_a = $('#node-input-aql').val()) === null || _a === void 0 ? void 0 : _a.toString()) || '',
+        });
+        var node = this;
+        $('#node-input-format').on('change', function () {
+          var mod = 'ace/mode/' + $('#node-input-format').val();
+          //@ts-ignore
+          node.aqlEditor.getSession().setMode({
+            path: mod,
+            v: Date.now(),
+          });
+        });
+        $('#node-input-initState').typedInput({
+          //@ts-ignore
+          type: 'aql',
+          types: ['aql'],
+        });
+      },
+      oneditsave: function () {
+        //@ts-ignore
+        $('#node-input-aql').val(this.aqlEditor.getValue());
+        //@ts-ignore
+        this.aqlEditor.destroy();
+        //@ts-ignore
+        delete this.aqlEditor;
+      },
+      oneditcancel: function () {
+        //@ts-ignore
+        this.aqlEditor.destroy();
+        //@ts-ignore
+        delete this.aqlEditor;
+      },
+    });
+
   }());
 </script>
 
@@ -551,4 +614,58 @@
     <dt>Name<span class="property-type">string</span></dt>
     <dd>Name of the node-red node visible in the UI.</dd>
   <dl>
+</script>
+
+<script type="text/html" data-template-name="aql-query">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-pond"><i class="icon-tag"></i> Pond</label>
+    <input type="text" id="node-input-pond" placeholder="Pond">
+  </div>
+  <div class="form-row" style="position: relative; margin-bottom: 0px;">
+    <label for="node-input-aql"><i class="fa fa-file-code-o"></i> AQL</label>
+    <input type="hidden" id="node-input-aql" autofocus="autofocus">
+    <div style="position: absolute; right:0;display:inline-block; text-align: right; font-size: 0.8em;">
+        <span >Syntax Highlight:</span>:
+        <select id="node-input-format" style="width:110px; font-size: 10px !important;  height: 24px; padding:0;">
+            <option value="aql">AQL</option>
+            <option value="text">Text</option>
+        </select>
+    </div>
+</div>
+<div class="form-row node-text-editor-row">
+    <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-aql-editor" ></div>
+</div>
+</script>
+
+<script type="text/html" data-help-name="aql-query">
+  <h1>AQL Query</h1>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">any</span>
+      </dt>
+      <dd>optional payload to define the aql query (<code>{{payload.name}}</code>).</dd>
+  </dl>
+  <h3>Output</h3>
+  <dl class="message-properties">
+      <dt>payload
+        <span class="property-type">any</span>
+      </dt>
+      <dd>result of the AQL query</dd>
+  </dl>
+  <h3>Settings</h3>
+  <dl class="message-properties">
+    <dt>Name<span class="property-type">string</span></dt>
+    <dd>Name of the node-red node visible in the UI.</dd>
+
+    <dt>AQL Query</dt>
+    <dd>
+      <p>Actyx Query Language to retrieve events from actyx</p>
+    </dd>
+  </dl>
 </script>
