@@ -1,0 +1,15 @@
+{
+  "name": "testproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node-red -u ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actyx-contrib/node-red-contrib-actyx-pond": "file:..",
+    "node-red": "2.0.6"
+  }
+}
