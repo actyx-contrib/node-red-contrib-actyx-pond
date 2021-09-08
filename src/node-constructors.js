@@ -3,12 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true })
 
 let { render } = require('mustache')
 let { getPond, Tag } = require('./pondLib')
+let { switchMap } = require('rxjs/operators')
 let { mkFishId, mkFish } = require("./util")
+const { combineLatest } = require('rxjs')
+const { RxPond } = require('@actyx-contrib/rx-pond')
+const { red } = require('colorette')
 
 const pondEmitNodeConstructor = (RED) => function (config) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   RED.nodes.createNode(this, config)
-  RED.log.info("register EmitNode")
   const node = this
   const { tags } = config
   this.status({ fill: 'yellow', shape: 'ring', text: 'connecting' })
@@ -40,7 +43,6 @@ const pondEmitNodeConstructor = (RED) => function (config) {
 
 const pondConfigNodeConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
-  RED.log.info("register ConfigNode")
 
   const { pondVersion, appid, displayname, version, signature } = config
   this.pondVersion = pondVersion
@@ -52,7 +54,6 @@ const pondConfigNodeConstructor = (RED) => function (config) {
 
 const pondObserveFishNodeConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
-  RED.log.info("register ObserveFishNode")
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const node = this
   let fish = undefined
@@ -81,17 +82,14 @@ const pondObserveFishNodeConstructor = (RED) => function (config) {
         shape: 'dot',
         text: `connected ${incomingFishId.entityType} ${incomingFishId.name}`,
       })
+      console.log(fish)
       if (!fish || fish.fishId !== incomingFishId) {
         fish = mkFish(message.fish, node)
         if (currentObservation) {
           currentObservation()
           currentObservation = undefined
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         currentObservation = pond.observe(
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
           fish, (newState) => {
             node.send({
               payload: newState,
@@ -105,7 +103,6 @@ const pondObserveFishNodeConstructor = (RED) => function (config) {
 
 const pondObserveNodeConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
-  RED.log.info("register ObserveNode")
 
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const node = this
@@ -126,7 +123,6 @@ const pondObserveNodeConstructor = (RED) => function (config) {
 
 const actyxFishNodeConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
-  RED.log.info("register FishNode")
   const { fishIdName, fishIdType, fishIdVersion, initState, where, onEvent, } = config
   this.on('input', (msg, send, done) => {
     send({
@@ -144,10 +140,58 @@ const actyxFishNodeConstructor = (RED) => function (config) {
   })
 }
 
+const pondObserveRegistryNodeConstructor = (RED) => function (config) {
+  RED.nodes.createNode(this, config)
+
+  const node = this
+  let currentObservation = undefined
+  const pondConfig = RED.nodes.getNode(config.pond)
+  const { fishIdType, fishIdVersion, initState, where, onEvent } = config
+
+  getPond(pondConfig, node).then((pond) => {
+    const rxPond = RxPond.from(pond)
+    node.status({
+      fill: 'green',
+      shape: 'ring',
+      text: 'connected (no ids)',
+    })
+
+    this.on('input', (msg, _send, done) => {
+      const entities = [...msg.payload].map(id => mkFish({
+        fishIdName: id,
+        fishIdType: render(fishIdType, { ...msg, id }),
+        fishIdVersion: fishIdVersion || '0',
+        initState: render(initState, { ...msg, id }),
+        where: render(where, { ...msg, id }),
+        onEvent: render(onEvent, { ...msg, id }),
+      }))
+
+      node.status({
+        fill: 'green',
+        shape: entities.length > 0 ? 'dot' : 'ring',
+        text: `connected to ${entities.length} entities`,
+      })
+
+      if (currentObservation) {
+        currentObservation.unsubscribe()
+        currentObservation = undefined
+      }
+
+      currentObservation = combineLatest(entities.map(rxPond.observe)).subscribe(
+        (newState) => {
+          node.send({
+            payload: newState,
+          })
+          done()
+        },
+        (err) => node.warn(err),
+      )
+    })
+  })
+}
+
 const actyxAqlQueryConstructor = (RED) => function (config) {
   RED.nodes.createNode(this, config)
-  RED.log.info("register AqlQueryNode")
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const node = this
 
   const pondConfig = RED.nodes.getNode(config.pond)
@@ -196,6 +240,7 @@ module.exports = {
   pondConfigNodeConstructor,
   pondObserveFishNodeConstructor,
   pondObserveNodeConstructor,
+  pondObserveRegistryNodeConstructor,
   actyxFishNodeConstructor,
   actyxAqlQueryConstructor,
 }

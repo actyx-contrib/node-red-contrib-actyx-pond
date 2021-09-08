@@ -64,6 +64,7 @@ const mkFish = (fishData, node) => ({
 })
 exports.mkFish = mkFish
 const mkOnEventFn = (onEvent, node) => {
+  // console.log("\n on event:\n", onEvent)
   try {
     return new Function('__inState__', '__inEvent__', '__inMetadata__', `try{ return (${onEvent})(__inState__, __inEvent__, __inMetadata__) } catch {return __inState__}`)
   }

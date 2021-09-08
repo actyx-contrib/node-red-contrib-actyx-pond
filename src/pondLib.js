@@ -25,7 +25,6 @@ const getPond = async (config, node) => {
       const interval = setInterval(() => {
         if (pond !== undefined) {
           clearInterval(interval)
-          console.log('Actyx-Pond: Wait for connected succeeded')
           res(pond)
         }
       }, 25)

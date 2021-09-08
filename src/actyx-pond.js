@@ -10,6 +10,7 @@ const nodeInit = (RED) => {
   RED.nodes.registerType('pond-observe-fish', nodes.pondObserveFishNodeConstructor(RED))
   RED.nodes.registerType('pond-observe', nodes.pondObserveNodeConstructor(RED))
   RED.nodes.registerType('aql-query', nodes.actyxAqlQueryConstructor(RED))
+  RED.nodes.registerType('pond-observe-registry', nodes.pondObserveRegistryNodeConstructor(RED))
   RED.log.info("Actyx nodes initialized")
 }
 
