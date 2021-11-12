@@ -1,3 +1,8 @@
+# IMPORTANT NOTICE
+
+This contrib module targets ActyxOS v1 and Pond v2 and is not compatible with Actyx v2 and Pond v3 / Actyx SDK.
+The preferred solution for Actyx v2 is to use the Actyx SDK to write a very simple custom NodeRED node for your purposes.
+
 # Node-RED Actyx Pond V2 integration
 
 Node-red contribution to write you fish as nodes or emit events to ActyxOS
